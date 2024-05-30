@@ -1,4 +1,4 @@
-# mioPortale
+# PORTALE
 Questo repository contiene il mio portale personale
 
-URL del sito: https://mattiabracco05.github.io/mioPortale/
+URL del sito: https://mattiabracco05.github.io/PORTALE/
