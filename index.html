@@ -17,21 +17,28 @@
   <meta property="og:url" content="https://mattiabracco05.github.io/PORTALE/">
   <meta property="og:image" content="https://mattiabracco05.github.io/PORTALE/assets/img/foto_profilo.jpg">
   <meta property="og:locale" content="it_IT">
+  <meta property="og:locale:alternate" content="en_GB">
   <meta name="twitter:card" content="summary_large_image">
 
   <!-- Favicon -->
   <link rel="icon" href="assets/img/favicon.jpg">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 
-  <!-- Tema salvato: applicato prima del render per evitare il lampo di colore -->
+  <!-- Tema e lingua salvati: applicati prima del render per evitare il lampo -->
   <script>
     (function () {
       try {
-        var saved = localStorage.getItem("portale-theme");
-        if (saved === "light" || saved === "dark") {
-          document.documentElement.setAttribute("data-theme", saved);
+        var th = localStorage.getItem("portale-theme");
+        if (th === "light" || th === "dark") {
+          document.documentElement.setAttribute("data-theme", th);
         } else if (window.matchMedia("(prefers-color-scheme: light)").matches) {
           document.documentElement.setAttribute("data-theme", "light");
+        }
+        var lg = localStorage.getItem("portale-lang");
+        if (lg === "it" || lg === "en") {
+          document.documentElement.setAttribute("lang", lg);
+        } else if (navigator.language && navigator.language.slice(0, 2).toLowerCase() !== "it") {
+          document.documentElement.setAttribute("lang", "en");
         }
       } catch (e) { /* localStorage non disponibile */ }
     })();
@@ -49,7 +56,7 @@
 
 <body>
 
-  <a class="skip-link" href="#collegamenti">Salta ai collegamenti</a>
+  <a class="skip-link" href="#collegamenti" data-i18n="skip">Salta ai collegamenti</a>
 
   <!-- ===== Sfondo animato ===== -->
   <div class="backdrop" aria-hidden="true">
@@ -67,34 +74,56 @@
     <div class="shell header__inner">
 
       <a class="logo" href="#hero">
-        <span class="logo__mark" aria-hidden="true">MB</span>
+        <span class="logo__mark" aria-hidden="true"><img src="assets/img/favicon.jpg" alt="" width="38" height="38" decoding="async"></span>
         <span>
           Portale
           <span class="logo__sub">Mattia Bracco</span>
         </span>
       </a>
 
-      <nav class="nav" id="nav" aria-label="Navigazione principale">
+      <nav class="nav" id="nav" aria-label="Menu">
         <ul>
-          <li><a href="#hero">Home</a></li>
-          <li><a href="#pilastri">In evidenza</a></li>
-          <li><a href="#collegamenti">Collegamenti</a></li>
-          <li><a href="#stack">Tecnologie</a></li>
-          <li><a href="#contatti">Contatti</a></li>
+          <li><a href="#hero" data-i18n="nav.home">Home</a></li>
+          <li><a href="#pilastri" data-i18n="nav.pillars">In evidenza</a></li>
+          <li><a href="#collegamenti" data-i18n="nav.links">Collegamenti</a></li>
+          <li><a href="#stack" data-i18n="nav.stack">Tecnologie</a></li>
+          <li><a href="#contatti" data-i18n="nav.contact">Contatti</a></li>
         </ul>
       </nav>
 
       <div class="header__tools">
-        <button class="cmd-hint" type="button" data-open-palette aria-label="Apri la ricerca rapida">
+
+        <!-- Selettore di lingua -->
+        <div class="lang" id="langSwitch" role="group" data-i18n-attr="aria-label:header.lang">
+          <button type="button" data-lang="it" aria-pressed="true" data-i18n-attr="aria-label:header.it, title:header.it">
+            <!-- Tricolore italiano -->
+            <svg class="flag" viewBox="0 0 60 40" aria-hidden="true">
+              <rect width="20" height="40" x="0" fill="#009246"/>
+              <rect width="20" height="40" x="20" fill="#f1f2f1"/>
+              <rect width="20" height="40" x="40" fill="#ce2b37"/>
+            </svg>
+          </button>
+          <button type="button" data-lang="en" aria-pressed="false" data-i18n-attr="aria-label:header.en, title:header.en">
+            <!-- Union Jack semplificata, proporzionata 3:2 come il tricolore -->
+            <svg class="flag" viewBox="0 0 60 40" aria-hidden="true">
+              <rect width="60" height="40" fill="#012169"/>
+              <path d="M0 0 60 40M60 0 0 40" stroke="#fff" stroke-width="8"/>
+              <path d="M0 0 60 40M60 0 0 40" stroke="#c8102e" stroke-width="5"/>
+              <path d="M30 0v40M0 20h60" stroke="#fff" stroke-width="13"/>
+              <path d="M30 0v40M0 20h60" stroke="#c8102e" stroke-width="8"/>
+            </svg>
+          </button>
+        </div>
+
+        <button class="cmd-hint" type="button" data-open-palette data-i18n-attr="aria-label:header.searchAria">
           <i class="bi bi-search"></i>
-          <span>Cerca</span>
-          <kbd>Ctrl</kbd><kbd>K</kbd>
+          <span data-i18n="header.search">Cerca</span>
         </button>
         <button class="icon-btn theme-toggle" type="button" aria-label="Passa al tema chiaro">
           <i class="bi bi-sun"></i>
           <i class="bi bi-moon-stars"></i>
         </button>
-        <button class="icon-btn burger" id="burger" type="button" aria-label="Apri il menu" aria-expanded="false" aria-controls="nav">
+        <button class="icon-btn burger" id="burger" type="button" aria-expanded="false" aria-controls="nav" data-i18n-attr="aria-label:header.menu">
           <i class="bi bi-list"></i>
         </button>
       </div>
@@ -110,14 +139,14 @@
 
         <span class="eyebrow">
           <span class="dot" aria-hidden="true"></span>
-          23 progetti online, tutti raggiungibili da qui
+          <span data-i18n="hero.eyebrow">23 progetti online, tutti raggiungibili da qui</span>
         </span>
 
         <!-- Il testo sotto è il fallback senza JavaScript: lo script lo sostituisce
-             con le righe animate descritte in data-lines ("*" = riga in gradiente) -->
-        <h1 data-lines="Un indirizzo|*per tutto|quello che ho fatto.">Un indirizzo per tutto quello che ho fatto.</h1>
+             con le righe animate prese da UI["hero.lines"] ("*" = riga in gradiente) -->
+        <h1 data-lines>Un indirizzo per tutto quello che ho fatto.</h1>
 
-        <p class="hero__lead">
+        <p class="hero__lead" data-i18n="hero.lead">
           Sono Mattia Bracco. Negli anni ho costruito siti, web app, giochi e raccolte di appunti,
           sparsi tra GitHub Pages, Firebase e domini miei. Questo portale li tiene insieme:
           cerca, filtra e apri quello che ti serve.
@@ -125,47 +154,47 @@
 
         <div class="hero__cta">
           <a class="btn btn--primary" href="#pilastri">
-            Scopri i progetti di punta <i class="bi bi-arrow-right"></i>
+            <span data-i18n="hero.cta1">Scopri i progetti di punta</span> <i class="bi bi-arrow-right"></i>
           </a>
           <button class="btn btn--ghost" type="button" data-open-palette>
-            <i class="bi bi-command"></i> Ricerca rapida
+            <i class="bi bi-command"></i> <span data-i18n="hero.cta2">Ricerca rapida</span>
           </button>
         </div>
 
         <div class="stats">
           <div class="stat">
-            <div class="stat__num" data-count="23">0</div>
-            <div class="stat__label">Progetti</div>
+            <div class="stat__num" data-count="22">0</div>
+            <div class="stat__label" data-i18n="stats.projects">Progetti</div>
           </div>
           <div class="stat">
             <div class="stat__num" data-count="5">0</div>
-            <div class="stat__label">Categorie</div>
+            <div class="stat__label" data-i18n="stats.categories">Categorie</div>
           </div>
           <div class="stat">
             <div class="stat__num" data-count="13">0</div>
-            <div class="stat__label">Tecnologie</div>
+            <div class="stat__label" data-i18n="stats.tech">Tecnologie</div>
           </div>
           <div class="stat">
             <div class="stat__num" data-count="2">0</div>
-            <div class="stat__label">Progetti di punta</div>
+            <div class="stat__label" data-i18n="stats.flagship">Progetti di punta</div>
           </div>
         </div>
 
       </div>
 
       <div class="scroll-cue" aria-hidden="true">
-        <span>Scorri</span>
+        <span data-i18n="hero.scroll">Scorri</span>
         <span class="scroll-cue__rail"></span>
       </div>
     </section>
 
     <!-- ===== Vetrina pinnata: i due progetti principali ===== -->
-    <section class="pillars" id="pilastri" aria-label="Progetti in evidenza">
+    <section class="pillars" id="pilastri" data-i18n-attr="aria-label:pillars.tag">
       <div class="shell">
         <div class="sec-head reveal">
-          <span class="sec-head__tag">I pilastri</span>
-          <h2>Due progetti su cui punto davvero</h2>
-          <p>
+          <span class="sec-head__tag" data-i18n="pillars.tag">I pilastri</span>
+          <h2 data-i18n="pillars.title">Due progetti su cui punto davvero</h2>
+          <p data-i18n="pillars.lead">
             Tutto il resto è una tappa del percorso. Questi due sono quelli che curo di più:
             resta fermo e scorri, cambiano loro.
           </p>
@@ -173,11 +202,8 @@
       </div>
 
       <div class="pillars__track" id="pillarsTrack">
-        <div class="pillars__stage" id="pillarsStage">
-          <!-- I pannelli vengono inseriti qui sopra dallo script; i pallini
-               restano dentro lo stage fisso per rimanere centrati a schermo -->
-          <div class="pillars__dots" id="pillarsDots" role="group" aria-label="Scegli il progetto in evidenza"></div>
-        </div>
+        <!-- Pannelli e pallini sono generati dallo script, così seguono la lingua -->
+        <div class="pillars__stage" id="pillarsStage"></div>
       </div>
     </section>
 
@@ -186,53 +212,61 @@
       <div class="shell">
 
         <div class="sec-head reveal">
-          <span class="sec-head__tag">Tutti i collegamenti</span>
-          <h2>L'archivio completo</h2>
-          <p>
-            Filtra per categoria, cerca per nome o tecnologia, scegli griglia o elenco.
-            Premi <kbd>/</kbd> per saltare alla ricerca, <kbd>Ctrl</kbd>+<kbd>K</kbd> per aprire qualsiasi sito in due tasti.
+          <span class="sec-head__tag" data-i18n="links.tag">Tutti i collegamenti</span>
+          <h2 data-i18n="links.title">L'archivio completo</h2>
+          <p data-i18n-html="links.lead">
+            Filtra per categoria, cerca per nome o tecnologia, scegli griglia o elenco.<span class="only-wide">
+            Premi <kbd>/</kbd> per saltare alla ricerca, <kbd>Ctrl</kbd>+<kbd>K</kbd> per aprire qualsiasi sito in due tasti.</span>
           </p>
         </div>
 
-        <!-- Barra strumenti -->
-        <div class="toolbar">
+        <!-- Barra strumenti: sotto gli 820px lo script la sposta dentro la scheda filtri -->
+        <div id="toolbarSlot"></div>
+        <div class="toolbar" id="toolbar">
           <div class="toolbar__row">
 
             <div class="search" id="searchWrap">
               <i class="bi bi-search" aria-hidden="true"></i>
-              <input id="search" type="search" placeholder="Cerca un sito, una tecnologia…" aria-label="Cerca tra i siti" autocomplete="off">
-              <button class="search__clear" id="searchClear" type="button" aria-label="Svuota la ricerca">
+              <input id="search" type="search" autocomplete="off"
+                     data-i18n-attr="placeholder:tool.searchPlaceholder, aria-label:tool.searchAria"
+                     placeholder="Cerca un sito, una tecnologia…" aria-label="Cerca tra i siti">
+              <button class="search__clear" id="searchClear" type="button" data-i18n-attr="aria-label:tool.clear">
                 <i class="bi bi-x-lg"></i>
               </button>
             </div>
 
             <div class="select">
-              <select id="sort" aria-label="Ordina i risultati">
-                <option value="reco">Consigliati</option>
-                <option value="name">Nome A → Z</option>
-                <option value="cat">Per categoria</option>
+              <select id="sort" data-i18n-attr="aria-label:tool.sortAria">
+                <option value="reco" data-i18n="tool.sortReco">Consigliati</option>
+                <option value="name" data-i18n="tool.sortName">Nome A → Z</option>
+                <option value="cat" data-i18n="tool.sortCat">Per categoria</option>
               </select>
               <i class="bi bi-chevron-down" aria-hidden="true"></i>
             </div>
 
-            <div class="viewswitch" id="viewSwitch" role="group" aria-label="Tipo di visualizzazione">
-              <button type="button" data-view="grid" aria-pressed="true" aria-label="Vista a griglia">
+            <div class="viewswitch" id="viewSwitch" role="group" data-i18n-attr="aria-label:tool.viewAria">
+              <button type="button" data-view="grid" aria-pressed="true" data-i18n-attr="aria-label:tool.viewGrid">
                 <i class="bi bi-grid"></i>
               </button>
-              <button type="button" data-view="list" aria-pressed="false" aria-label="Vista a elenco">
+              <button type="button" data-view="list" aria-pressed="false" data-i18n-attr="aria-label:tool.viewList">
                 <i class="bi bi-list-ul"></i>
               </button>
             </div>
 
           </div>
 
+          <!-- Le chip sono generate dallo script, con i contatori presi dai dati -->
           <div class="chips" id="chips" role="group" aria-label="Filtra per categoria"></div>
         </div>
 
         <div class="results-line">
-          <span><strong id="resultCount">23</strong> <span id="resultLabel">siti</span> trovati</span>
-          <button class="reset-link" id="resetFilters" type="button" hidden>
-            <i class="bi bi-arrow-counterclockwise"></i> Azzera i filtri
+          <span>
+            <strong data-result-count>22</strong>
+            <span data-result-label>siti</span>
+            <span data-i18n="res.found">trovati</span>
+          </span>
+          <button class="reset-link" data-reset type="button" hidden>
+            <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="res.reset">Azzera i filtri</span>
           </button>
         </div>
 
@@ -240,18 +274,18 @@
 
         <div class="empty" id="empty">
           <i class="bi bi-emoji-frown" aria-hidden="true"></i>
-          <h3>Nessun sito corrisponde</h3>
-          <p>Prova con un'altra parola o azzera i filtri.</p>
+          <h3 data-i18n="empty.title">Nessun sito corrisponde</h3>
+          <p data-i18n="empty.text">Prova con un'altra parola o azzera i filtri.</p>
         </div>
 
         <noscript>
           <p style="margin-top:24px">
-            I filtri richiedono JavaScript. Ecco l'elenco completo:
+            I filtri richiedono JavaScript. Ecco l'elenco completo —
+            <em>filters need JavaScript; here is the full list:</em>
           </p>
           <ul style="margin-top:14px;display:grid;gap:8px">
-            <li><a href="https://mydroneview.it">MyDroneView</a> — fotografia aerea e video con drone</li>
-            <li><a href="https://mattiabracco05.github.io/MattheWeb">MattheWeb</a> — sito personale</li>
-            <li><a href="https://mattiabracco05.github.io/PHOTOFOLIO/">PHOTOFOLIO</a></li>
+            <li><a href="https://mydroneview.it">MyDroneView</a></li>
+            <li><a href="https://mattiabracco05.github.io/MattheWeb">MattheWeb</a></li>
             <li><a href="https://mattiabracco05.github.io/FANTA-ANIMATORI-GAME/">Fanta Animatori</a></li>
             <li><a href="https://mattiabracco05.github.io/APPUNTI-TPSIT/">Appunti TPSIT</a></li>
             <li><a href="https://appunti-65795.firebaseapp.com/index">Appunti NodeJS</a></li>
@@ -282,12 +316,12 @@
     <section class="section" id="stack">
       <div class="shell">
         <div class="sec-head reveal">
-          <span class="sec-head__tag">Con cosa li costruisco</span>
-          <h2>Gli strumenti che uso</h2>
-          <p>Dal primo sito di appunti in HTML alle web app con Firebase e ai giochi in Phaser 3.</p>
+          <span class="sec-head__tag" data-i18n="stack.tag">Con cosa li costruisco</span>
+          <h2 data-i18n="stack.title">Gli strumenti che uso</h2>
+          <p data-i18n="stack.lead">Dal primo sito di appunti in HTML alle web app con Firebase e ai giochi in Phaser 3.</p>
         </div>
       </div>
-      <div class="marquee reveal" id="techMarquee" aria-label="Tecnologie utilizzate"></div>
+      <div class="marquee reveal" id="techMarquee" data-i18n-attr="aria-label:stack.aria"></div>
     </section>
 
     <!-- ===== Contatti ===== -->
@@ -295,51 +329,39 @@
       <div class="shell">
 
         <div class="sec-head reveal">
-          <span class="sec-head__tag">Contatti</span>
-          <h2>Scrivimi quando vuoi</h2>
-          <p>Per una collaborazione, una ripresa con il drone o semplicemente due parole sul codice.</p>
+          <h2 data-i18n="contact.title">Contattami</h2>
         </div>
 
         <div class="contact-grid">
 
           <div class="contact-card reveal" style="--tone: var(--cat-flagship); --i:0">
             <i class="bi bi-envelope-paper contact-card__icon" aria-hidden="true"></i>
-            <h3>Email</h3>
-            <p>mattia.bracco05@gmail.com</p>
-            <span class="contact-card__action">
-              <i class="bi bi-clipboard-check"></i> Clicca per copiare
+            <h3 data-i18n="contact.email">Email</h3>
+            <p class="contact-card__desc" data-i18n="contact.emailDesc">Scrivimi, oppure copia l'indirizzo con un clic.</p>
+            <span class="contact-card__value">
+              <i class="bi bi-clipboard-check" aria-hidden="true"></i> mattia.bracco05@gmail.com
             </span>
-            <button class="contact-card__link" type="button" data-copy-email aria-label="Copia l'indirizzo email negli appunti"></button>
+            <button class="contact-card__link" type="button" data-copy-email data-i18n-attr="aria-label:contact.emailAria"></button>
           </div>
 
           <div class="contact-card reveal" style="--tone: var(--cat-scuola); --i:1">
             <i class="bi bi-github contact-card__icon" aria-hidden="true"></i>
             <h3>GitHub</h3>
-            <p>Il codice di quasi tutto quello che vedi qui.</p>
-            <span class="contact-card__action">
-              <i class="bi bi-arrow-up-right"></i> MattiaBracco05
+            <p class="contact-card__desc" data-i18n="contact.githubText">Il codice di quasi tutto quello che vedi qui.</p>
+            <span class="contact-card__value">
+              <i class="bi bi-arrow-up-right" aria-hidden="true"></i> MattiaBracco05
             </span>
-            <a class="contact-card__link" href="https://github.com/MattiaBracco05" target="_blank" rel="noopener" aria-label="Apri il mio profilo GitHub"></a>
+            <a class="contact-card__link" href="https://github.com/MattiaBracco05" target="_blank" rel="noopener" data-i18n-attr="aria-label:contact.githubAria"></a>
           </div>
 
           <div class="contact-card reveal" style="--tone: var(--cat-ricerche); --i:2">
             <i class="bi bi-instagram contact-card__icon" aria-hidden="true"></i>
             <h3>Instagram</h3>
-            <p>Foto, riprese dall'alto e vita fuori dallo schermo.</p>
-            <span class="contact-card__action">
-              <i class="bi bi-arrow-up-right"></i> @matti_bracco
+            <p class="contact-card__desc" data-i18n="contact.igText">Foto, riprese dall'alto e vita fuori dallo schermo.</p>
+            <span class="contact-card__value">
+              <i class="bi bi-arrow-up-right" aria-hidden="true"></i> @matti_bracco
             </span>
-            <a class="contact-card__link" href="https://www.instagram.com/matti_bracco/" target="_blank" rel="noopener" aria-label="Apri il mio profilo Instagram"></a>
-          </div>
-
-          <div class="contact-card reveal" style="--tone: var(--cat-appunti); --i:3">
-            <i class="bi bi-airplane-engines contact-card__icon" aria-hidden="true"></i>
-            <h3>MyDroneView</h3>
-            <p>Vuoi vedere il tuo progetto dall'alto? Parliamone.</p>
-            <span class="contact-card__action">
-              <i class="bi bi-arrow-up-right"></i> mydroneview.it
-            </span>
-            <a class="contact-card__link" href="https://mydroneview.it" target="_blank" rel="noopener" aria-label="Apri MyDroneView"></a>
+            <a class="contact-card__link" href="https://www.instagram.com/matti_bracco/" target="_blank" rel="noopener" data-i18n-attr="aria-label:contact.igAria"></a>
           </div>
 
         </div>
@@ -357,12 +379,12 @@
 
         <div class="footer__about">
           <a class="logo" href="#hero">
-            <span class="logo__mark" aria-hidden="true">MB</span>
+            <span class="logo__mark" aria-hidden="true"><img src="assets/img/favicon.jpg" alt="" width="38" height="38" decoding="async"></span>
             <span>Portale<span class="logo__sub">Mattia Bracco</span></span>
           </a>
-          <p>
+          <p data-i18n-html="footer.about">
             Un unico indirizzo per tutti i siti che ho realizzato. Se cerchi il lavoro più recente,
-            parti da <a href="https://mydroneview.it" target="_blank" rel="noopener" style="color:hsl(var(--accent-3))">MyDroneView</a>.
+            parti da <a href="https://mydroneview.it" target="_blank" rel="noopener">MyDroneView</a>.
           </p>
           <div class="socials">
             <a href="https://www.instagram.com/matti_bracco/" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
@@ -373,37 +395,72 @@
         </div>
 
         <div>
-          <h4>Naviga</h4>
+          <h4 data-i18n="footer.nav">Naviga</h4>
           <ul class="footer__links">
-            <li><a href="#hero">Home</a></li>
-            <li><a href="#pilastri">In evidenza</a></li>
-            <li><a href="#collegamenti">Collegamenti</a></li>
-            <li><a href="#stack">Tecnologie</a></li>
-            <li><a href="#contatti">Contatti</a></li>
+            <li><a href="#hero" data-i18n="nav.home">Home</a></li>
+            <li><a href="#pilastri" data-i18n="nav.pillars">In evidenza</a></li>
+            <li><a href="#collegamenti" data-i18n="nav.links">Collegamenti</a></li>
+            <li><a href="#stack" data-i18n="nav.stack">Tecnologie</a></li>
+            <li><a href="#contatti" data-i18n="nav.contact">Contatti</a></li>
           </ul>
         </div>
 
         <div>
-          <h4>In evidenza</h4>
+          <h4 data-i18n="footer.highlights">In evidenza</h4>
           <ul class="footer__links">
             <li><a href="https://mydroneview.it" target="_blank" rel="noopener">MyDroneView</a></li>
             <li><a href="https://mattiabracco05.github.io/MattheWeb" target="_blank" rel="noopener">MattheWeb</a></li>
-            <li><a href="https://mattiabracco05.github.io/PHOTOFOLIO/" target="_blank" rel="noopener">PHOTOFOLIO</a></li>
+            <li><a href="https://mydroneview.it" target="_blank" rel="noopener">mydroneview.it</a></li>
           </ul>
         </div>
 
       </div>
 
       <div class="footer__bottom">
-        <p>© <span id="year">2026</span> Mattia Bracco — Portale</p>
-        <p>Scorciatoie: <kbd>/</kbd> cerca · <kbd>Ctrl</kbd>+<kbd>K</kbd> apri · <kbd>T</kbd> tema</p>
+        <p>© <span id="year">2026</span> <span data-i18n="footer.copy">Mattia Bracco — Portale</span></p>
+        <p data-i18n-html="footer.shortcuts">Scorciatoie: <kbd>/</kbd> cerca · <kbd>T</kbd> tema</p>
       </div>
 
     </div>
   </footer>
 
+  <!-- ===== Pulsanti flottanti (solo telefono) ===== -->
+  <div class="fabs" id="fabs">
+    <button class="fab" id="fabSearch" type="button" data-i18n-attr="aria-label:hero.cta2">
+      <i class="bi bi-search"></i>
+    </button>
+    <button class="fab" id="fabFilters" type="button" data-i18n-attr="aria-label:fab.filters">
+      <i class="bi bi-sliders"></i>
+    </button>
+  </div>
+
+  <!-- ===== Scheda filtri (solo telefono) ===== -->
+  <div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-hidden="true" data-i18n-attr="aria-label:sheet.title">
+    <div class="sheet__panel">
+      <span class="sheet__grip" aria-hidden="true"></span>
+      <div class="sheet__head">
+        <h3 data-i18n="sheet.title">Filtri e ricerca</h3>
+        <button class="icon-btn" type="button" data-sheet-close data-i18n-attr="aria-label:sheet.close">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <!-- La barra strumenti viene spostata qui dallo script: nessun controllo duplicato -->
+      <div class="sheet__body" id="sheetBody"></div>
+      <div class="sheet__foot">
+        <button class="reset-link" data-reset type="button" hidden>
+          <i class="bi bi-arrow-counterclockwise"></i> <span data-i18n="res.reset">Azzera i filtri</span>
+        </button>
+        <button class="btn btn--primary" type="button" data-sheet-close>
+          <span data-i18n="sheet.show">Mostra</span>
+          <strong data-result-count>22</strong>
+          <span data-result-label>siti</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== Torna su (con anello di avanzamento) ===== -->
-  <a class="to-top" id="toTop" href="#hero" aria-label="Torna all'inizio">
+  <a class="to-top" id="toTop" href="#hero" data-i18n-attr="aria-label:toTop">
     <svg viewBox="0 0 50 50" aria-hidden="true">
       <circle cx="25" cy="25" r="24" pathLength="1"></circle>
     </svg>
@@ -411,18 +468,20 @@
   </a>
 
   <!-- ===== Palette comandi ===== -->
-  <div class="palette" id="palette" role="dialog" aria-modal="true" aria-label="Ricerca rapida" aria-hidden="true">
+  <div class="palette" id="palette" role="dialog" aria-modal="true" aria-hidden="true" data-i18n-attr="aria-label:palette.aria">
     <div class="palette__box">
       <div class="palette__field">
         <i class="bi bi-search" aria-hidden="true"></i>
-        <input id="paletteInput" type="text" placeholder="Scrivi il nome di un sito o di un'azione…" aria-label="Cerca un sito o un'azione" autocomplete="off">
+        <input id="paletteInput" type="text" autocomplete="off"
+               data-i18n-attr="placeholder:palette.placeholder, aria-label:palette.inputAria"
+               placeholder="Scrivi il nome di un sito o di un'azione…" aria-label="Cerca un sito o un'azione">
         <kbd>Esc</kbd>
       </div>
-      <div class="palette__list" id="paletteList" role="listbox" aria-label="Risultati"></div>
+      <div class="palette__list" id="paletteList" role="listbox" data-i18n-attr="aria-label:palette.results"></div>
       <div class="palette__foot">
-        <span><kbd>↑</kbd><kbd>↓</kbd> naviga</span>
-        <span><kbd>Enter</kbd> apri</span>
-        <span><kbd>Esc</kbd> chiudi</span>
+        <span><kbd>↑</kbd><kbd>↓</kbd> <span data-i18n="palette.nav">naviga</span></span>
+        <span><kbd>Enter</kbd> <span data-i18n="palette.open">apri</span></span>
+        <span><kbd>Esc</kbd> <span data-i18n="palette.close">chiudi</span></span>
       </div>
     </div>
   </div>

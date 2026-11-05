@@ -1,63 +1,361 @@
 /* ===========================================================
    PORTALE — Mattia Bracco
-   Logica del sito: dati, filtri, animazioni, palette comandi
+   Logica del sito: dati, lingue, filtri, animazioni, palette
    =========================================================== */
 (function () {
   "use strict";
 
   /* -----------------------------------------------------------
+     0. LINGUA
+        I testi stanno in UI (interfaccia) e dentro i dati dei siti
+        come oggetti { it: "...", en: "..." }.
+     ----------------------------------------------------------- */
+  var LANGS = ["it", "en"];
+  var lang = "it";
+
+  var UI = {
+    it: {
+      "skip": "Salta ai collegamenti",
+      "nav.home": "Home",
+      "nav.pillars": "In evidenza",
+      "nav.links": "Collegamenti",
+      "nav.stack": "Tecnologie",
+      "nav.contact": "Contatti",
+      "header.search": "Cerca",
+      "header.searchAria": "Apri la ricerca rapida",
+      "header.menu": "Apri il menu",
+      "header.lang": "Lingua",
+      "header.it": "Italiano",
+      "header.en": "Inglese",
+      "theme.toLight": "Passa al tema chiaro",
+      "theme.toDark": "Passa al tema scuro",
+
+      "hero.eyebrow": "22 progetti online, tutti raggiungibili da qui",
+      "hero.lines": "Un indirizzo|*per tutto|quello che ho fatto.",
+      "hero.lead": "Sono Mattia Bracco. Negli anni ho costruito siti, web app, giochi e raccolte di appunti, sparsi tra GitHub Pages, Firebase e domini miei. Questo portale li tiene insieme: cerca, filtra e apri quello che ti serve.",
+      "hero.cta1": "Scopri i progetti di punta",
+      "hero.cta2": "Ricerca rapida",
+      "hero.scroll": "Scorri",
+      "stats.projects": "Progetti",
+      "stats.categories": "Categorie",
+      "stats.tech": "Tecnologie",
+      "stats.flagship": "Progetti di punta",
+
+      "pillars.tag": "I pilastri",
+      "pillars.title": "Due progetti su cui punto davvero",
+      "pillars.lead": "Tutto il resto è una tappa del percorso. Questi due sono quelli che curo di più: resta fermo e scorri, cambiano loro.",
+      "pillars.dots": "Scegli il progetto in evidenza",
+      "pillars.goto": "Vai a",
+      "pillars.open": "Apri",
+
+      "links.tag": "Tutti i collegamenti",
+      "links.title": "L'archivio completo",
+      "links.lead": "Filtra per categoria, cerca per nome o tecnologia, scegli griglia o elenco.<span class=\"only-wide\"> Premi <kbd>/</kbd> per saltare alla ricerca, <kbd>Ctrl</kbd>+<kbd>K</kbd> per aprire qualsiasi sito in due tasti.</span>",
+      "tool.searchPlaceholder": "Cerca un sito, una tecnologia…",
+      "tool.searchAria": "Cerca tra i siti",
+      "tool.clear": "Svuota la ricerca",
+      "tool.sortAria": "Ordina i risultati",
+      "tool.sortReco": "Consigliati",
+      "tool.sortName": "Nome A → Z",
+      "tool.sortCat": "Per categoria",
+      "tool.viewAria": "Tipo di visualizzazione",
+      "tool.viewGrid": "Vista a griglia",
+      "tool.viewList": "Vista a elenco",
+      "tool.catAria": "Filtra per categoria",
+      "tool.all": "Tutti",
+      "res.site": "sito",
+      "res.sites": "siti",
+      "res.found": "trovati",
+      "res.reset": "Azzera i filtri",
+      "empty.title": "Nessun sito corrisponde",
+      "empty.text": "Prova con un'altra parola o azzera i filtri.",
+      "card.open": "Apri",
+      "badge.star": "In evidenza",
+
+      "stack.tag": "Con cosa li costruisco",
+      "stack.title": "Gli strumenti che uso",
+      "stack.lead": "Dal primo sito di appunti in HTML alle web app con Firebase e ai giochi in Phaser 3.",
+      "stack.aria": "Tecnologie utilizzate",
+
+      "contact.title": "Contattami",
+      "contact.email": "Email",
+      "contact.emailDesc": "Scrivimi, oppure copia l'indirizzo con un clic.",
+      "contact.emailAria": "Copia l'indirizzo email negli appunti",
+      "contact.githubText": "Il codice di quasi tutto quello che vedi qui.",
+      "contact.githubAria": "Apri il mio profilo GitHub",
+      "contact.igText": "Foto, riprese dall'alto e vita fuori dallo schermo.",
+      "contact.igAria": "Apri il mio profilo Instagram",
+
+      "footer.about": "Un unico indirizzo per tutti i siti che ho realizzato. Se cerchi il lavoro più recente, parti da <a href=\"https://mydroneview.it\" target=\"_blank\" rel=\"noopener\">MyDroneView</a>.",
+      "footer.nav": "Naviga",
+      "footer.highlights": "In evidenza",
+      "footer.copy": "Mattia Bracco — Portale",
+      "footer.shortcuts": "Scorciatoie: <kbd>/</kbd> cerca · <kbd>T</kbd> tema",
+      "toTop": "Torna all'inizio",
+      "sheet.title": "Filtri e ricerca",
+      "sheet.close": "Chiudi i filtri",
+      "sheet.show": "Mostra",
+      "fab.filters": "Apri i filtri di ricerca",
+
+      "palette.aria": "Ricerca rapida",
+      "palette.placeholder": "Scrivi il nome di un sito o di un'azione…",
+      "palette.inputAria": "Cerca un sito o un'azione",
+      "palette.results": "Risultati",
+      "palette.nav": "naviga",
+      "palette.open": "apri",
+      "palette.close": "chiudi",
+      "palette.empty": "Nessun risultato per",
+      "palette.action": "Azione",
+      "act.links": "Vai ai collegamenti",
+      "act.linksDesc": "Scorri alla griglia dei siti",
+      "act.theme": "Cambia tema",
+      "act.themeDesc": "Alterna chiaro e scuro",
+      "act.copy": "Copia la mia email",
+      "act.github": "Profilo GitHub",
+      "act.lang": "Switch to English",
+      "act.langDesc": "Passa alla versione inglese",
+
+      "toast.light": "Tema chiaro attivo",
+      "toast.dark": "Tema scuro attivo",
+      "toast.copied": "Email copiata negli appunti",
+      "toast.copyFail": "Copia non riuscita:",
+      "toast.lang": "Lingua: Italiano"
+    },
+
+    en: {
+      "skip": "Skip to the links",
+      "nav.home": "Home",
+      "nav.pillars": "Highlights",
+      "nav.links": "Projects",
+      "nav.stack": "Tech",
+      "nav.contact": "Contact",
+      "header.search": "Search",
+      "header.searchAria": "Open quick search",
+      "header.menu": "Open menu",
+      "header.lang": "Language",
+      "header.it": "Italian",
+      "header.en": "English",
+      "theme.toLight": "Switch to light theme",
+      "theme.toDark": "Switch to dark theme",
+
+      "hero.eyebrow": "22 projects online, all reachable from here",
+      "hero.lines": "One address|*for everything|I have built.",
+      "hero.lead": "I'm Mattia Bracco. Over the years I have built websites, web apps, games and sets of study notes, scattered across GitHub Pages, Firebase and my own domains. This portal keeps them together: search, filter and open whatever you need.",
+      "hero.cta1": "See the flagship projects",
+      "hero.cta2": "Quick search",
+      "hero.scroll": "Scroll",
+      "stats.projects": "Projects",
+      "stats.categories": "Categories",
+      "stats.tech": "Technologies",
+      "stats.flagship": "Flagship projects",
+
+      "pillars.tag": "The pillars",
+      "pillars.title": "Two projects I really bet on",
+      "pillars.lead": "Everything else is a step along the way. These two are the ones I look after most: stay put and scroll — they do the moving.",
+      "pillars.dots": "Pick a highlighted project",
+      "pillars.goto": "Go to",
+      "pillars.open": "Open",
+
+      "links.tag": "All the links",
+      "links.title": "The full archive",
+      "links.lead": "Filter by category, search by name or technology, pick grid or list.<span class=\"only-wide\"> Press <kbd>/</kbd> to jump to the search box, <kbd>Ctrl</kbd>+<kbd>K</kbd> to open any site in two keystrokes.</span>",
+      "tool.searchPlaceholder": "Search a site, a technology…",
+      "tool.searchAria": "Search the sites",
+      "tool.clear": "Clear the search",
+      "tool.sortAria": "Sort the results",
+      "tool.sortReco": "Recommended",
+      "tool.sortName": "Name A → Z",
+      "tool.sortCat": "By category",
+      "tool.viewAria": "View mode",
+      "tool.viewGrid": "Grid view",
+      "tool.viewList": "List view",
+      "tool.catAria": "Filter by category",
+      "tool.all": "All",
+      "res.site": "site",
+      "res.sites": "sites",
+      "res.found": "found",
+      "res.reset": "Reset the filters",
+      "empty.title": "No site matches",
+      "empty.text": "Try another word or reset the filters.",
+      "card.open": "Open",
+      "badge.star": "Highlighted",
+
+      "stack.tag": "What I build them with",
+      "stack.title": "The tools I use",
+      "stack.lead": "From my first HTML notes site to Firebase web apps and Phaser 3 games.",
+      "stack.aria": "Technologies used",
+
+      "contact.title": "Contact me",
+      "contact.email": "Email",
+      "contact.emailDesc": "Write to me, or copy the address with one click.",
+      "contact.emailAria": "Copy the email address to the clipboard",
+      "contact.githubText": "The code behind almost everything you see here.",
+      "contact.githubAria": "Open my GitHub profile",
+      "contact.igText": "Photos, shots from above and life away from the screen.",
+      "contact.igAria": "Open my Instagram profile",
+
+      "footer.about": "One address for every site I have built. If you are after the most recent work, start from <a href=\"https://mydroneview.it\" target=\"_blank\" rel=\"noopener\">MyDroneView</a>.",
+      "footer.nav": "Navigate",
+      "footer.highlights": "Highlights",
+      "footer.copy": "Mattia Bracco — Portal",
+      "footer.shortcuts": "Shortcuts: <kbd>/</kbd> search · <kbd>T</kbd> theme",
+      "toTop": "Back to top",
+      "sheet.title": "Filters and search",
+      "sheet.close": "Close the filters",
+      "sheet.show": "Show",
+      "fab.filters": "Open the search filters",
+
+      "palette.aria": "Quick search",
+      "palette.placeholder": "Type the name of a site or an action…",
+      "palette.inputAria": "Search a site or an action",
+      "palette.results": "Results",
+      "palette.nav": "navigate",
+      "palette.open": "open",
+      "palette.close": "close",
+      "palette.empty": "No results for",
+      "palette.action": "Action",
+      "act.links": "Go to the projects",
+      "act.linksDesc": "Scroll to the grid of sites",
+      "act.theme": "Switch theme",
+      "act.themeDesc": "Toggle light and dark",
+      "act.copy": "Copy my email",
+      "act.github": "GitHub profile",
+      "act.lang": "Passa all'italiano",
+      "act.langDesc": "Switch to the Italian version",
+
+      "toast.light": "Light theme on",
+      "toast.dark": "Dark theme on",
+      "toast.copied": "Email copied to the clipboard",
+      "toast.copyFail": "Copy failed:",
+      "toast.lang": "Language: English"
+    }
+  };
+
+  function t(key) {
+    var d = UI[lang] || UI.it;
+    return d[key] != null ? d[key] : (UI.it[key] != null ? UI.it[key] : key);
+  }
+
+  /* Risolve un valore che può essere una stringa o un oggetto { it, en } */
+  function tr(v) {
+    if (v && typeof v === "object" && !Array.isArray(v)) {
+      return v[lang] != null ? v[lang] : v.it;
+    }
+    return v;
+  }
+
+  /* Glossario dei tag: tradotto solo quello che non è un nome proprio */
+  var TAG_EN = {
+    "Personale": "Personal",
+    "Fotografia": "Photography",
+    "Galleria": "Gallery",
+    "Campi estivi": "Summer camps",
+    "Guida": "Guide",
+    "Primo sito": "First site",
+    "Inglese": "English",
+    "Ricerca": "Research",
+    "PCTO": "Work placement",
+    "Maturità": "Final exam",
+    "Classe": "Class",
+    "Sicurezza": "Safety",
+    "Prenotazioni": "Bookings",
+    "API REST": "REST API"
+  };
+  function trTags(tags) {
+    return lang === "en" ? tags.map(function (x) { return TAG_EN[x] || x; }) : tags;
+  }
+
+  /* -----------------------------------------------------------
      1. DATI — per aggiungere un sito basta una voce qui sotto.
-        cat:  top | personali | appunti | ricerche | giochi | scuola
+        cat:  personali | appunti | ricerche | giochi | scuola
         star: true  -> compare anche nella vetrina "I pilastri"
+        I testi con { it, en } seguono la lingua scelta.
      ----------------------------------------------------------- */
   var CATEGORIES = [
-    { key: "star",      label: "In evidenza",  tone: "--cat-flagship", icon: "bi-stars" },
-    { key: "personali", label: "Personali",    tone: "--cat-personali", icon: "bi-person-badge" },
-    { key: "appunti",   label: "Appunti",      tone: "--cat-appunti",   icon: "bi-journal-text" },
-    { key: "ricerche",  label: "Ricerche",     tone: "--cat-ricerche",  icon: "bi-search" },
-    { key: "giochi",    label: "Giochi",       tone: "--cat-giochi",    icon: "bi-controller" },
-    { key: "scuola",    label: "Scuola",       tone: "--cat-scuola",    icon: "bi-mortarboard" }
+    { key: "star",      label: { it: "In evidenza", en: "Highlights" }, tone: "--cat-flagship" },
+    { key: "personali", label: { it: "Personali", en: "Personal" },     tone: "--cat-personali" },
+    { key: "appunti",   label: { it: "Appunti", en: "Notes" },          tone: "--cat-appunti" },
+    { key: "ricerche",  label: { it: "Ricerche", en: "Research" },      tone: "--cat-ricerche" },
+    { key: "giochi",    label: { it: "Giochi", en: "Games" },           tone: "--cat-giochi" },
+    { key: "scuola",    label: { it: "Scuola", en: "School" },          tone: "--cat-scuola" }
   ];
+
+  /* Quadricottero disegnato a mano: Bootstrap Icons non ha un'icona drone.
+     Le eliche sono in un <g> a parte per poterle far girare via CSS. */
+  function droneSVG(cls) {
+    var rotors = [[5, 5], [19, 5], [5, 19], [19, 19]]
+      .map(function (r) {
+        return '<circle cx="' + r[0] + '" cy="' + r[1] + '" r="2.7"/>' +
+               '<g class="drone-blade" style="--ox:' + r[0] + 'px; --oy:' + r[1] + 'px">' +
+                 '<path d="M' + (r[0] - 2.1) + " " + r[1] + 'h4.2"/>' +
+                 '<path d="M' + r[0] + " " + (r[1] - 2.1) + 'v4.2"/>' +
+               "</g>";
+      })
+      .join("");
+    return '<svg class="' + cls + ' drone" viewBox="0 0 24 24" fill="none" stroke="currentColor" ' +
+             'stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+             // braccia dal corpo verso i quattro rotori
+             '<path d="M9.8 9.8 6.9 6.9M14.2 9.8 17.1 6.9M9.8 14.2 6.9 17.1M14.2 14.2 17.1 17.1"/>' +
+             // scocca centrale
+             '<rect x="8.5" y="8.5" width="7" height="7" rx="2.4"/>' +
+             // obiettivo sul gimbal
+             '<circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/>' +
+             rotors +
+           "</svg>";
+  }
+
+  /* Segno grafico di un sito: SVG su misura se previsto, altrimenti icona del font */
+  function markOf(s, iconName, cls) {
+    return s.svg === "drone"
+      ? droneSVG(cls || "")
+      : '<i class="bi ' + iconName + (cls ? " " + cls : "") + '"></i>';
+  }
 
   var SITES = [
     {
       name: "MyDroneView",
       url: "https://mydroneview.it",
-      desc: "Fotografia aerea e video con drone: missioni, gallerie e un panorama sferico a 360° navigabile.",
+      desc: {
+        it: "Fotografia aerea e video con drone: missioni, gallerie e un panorama sferico a 360° navigabile.",
+        en: "Aerial photography and drone video: missions, galleries and a navigable 360° spherical panorama."
+      },
       cat: "personali",
-      icon: "bi-airplane-engines",
+      icon: "bi-airplane-engines", // riserva: il segno reale e' l'SVG del drone
+      svg: "drone",
       tags: ["Drone", "4K", "360°"],
       star: true,
-      role: "Progetto di punta",
-      long: "Il mio progetto dedicato alle riprese dall'alto. Ogni lavoro è raccontato come una missione di volo, con video, foto aeree e la mappa dei punti di ripresa — dalle coste di Zante e Palma di Maiorca ai raduni in Piemonte. Dentro c'è anche un panorama sferico a 360° da esplorare.",
-      claim: "Prospettive elevate.",
+      role: { it: "Progetto di punta", en: "Flagship project" },
+      long: {
+        it: "Il mio progetto dedicato alle riprese dall'alto. Ogni lavoro è raccontato come una missione di volo, con video, foto aeree e la mappa dei punti di ripresa — dalle coste di Zante e Palma di Maiorca ai raduni in Piemonte. Dentro c'è anche un panorama sferico a 360° da esplorare.",
+        en: "My project devoted to shooting from above. Every job is told as a flight mission, with video, aerial photos and a map of the shooting points — from the coasts of Zakynthos and Palma de Mallorca to gatherings in Piedmont. Inside there is also a 360° spherical panorama to explore."
+      },
       glyph: "bi-airplane-engines"
     },
     {
       name: "MattheWeb",
       url: "https://mattiabracco05.github.io/MattheWeb",
-      desc: "Il mio sito personale: chi sono, cosa faccio e dove trovarmi.",
+      desc: {
+        it: "Il mio sito personale: chi sono, cosa faccio e dove trovarmi.",
+        en: "My personal site: who I am, what I do and where to find me."
+      },
       cat: "personali",
-      icon: "bi-house-heart",
+      icon: "bi-person-circle",
       tags: ["Personale", "GitHub Pages"],
       star: true,
-      role: "Casa base",
-      long: "Il punto di partenza di tutto: il sito personale dove racconto chi sono, il percorso tecnico e i lavori a cui tengo di più. È il biglietto da visita a cui rimandano tutti gli altri progetti.",
-      claim: "Il mio biglietto da visita.",
-      glyph: "bi-house-heart"
-    },
-    {
-      name: "PHOTOFOLIO",
-      url: "https://mattiabracco05.github.io/PHOTOFOLIO/",
-      desc: "Galleria fotografica personale, scatto dopo scatto.",
-      cat: "personali",
-      icon: "bi-camera",
-      tags: ["Fotografia", "Galleria"]
+      role: { it: "Casa base", en: "Home base" },
+      long: {
+        it: "Il punto di partenza di tutto: il sito personale dove racconto chi sono, il percorso tecnico e i lavori a cui tengo di più. È il biglietto da visita a cui rimandano tutti gli altri progetti.",
+        en: "The starting point of everything: the personal site where I tell who I am, my technical path and the work I care about most. It is the business card all the other projects point back to."
+      },
+      glyph: "bi-person-circle"
     },
     {
       name: "Fanta Animatori",
       url: "https://mattiabracco05.github.io/FANTA-ANIMATORI-GAME/",
-      desc: "Il gioco del Fanta Animatori per i campi estivi di Sant'Anna di Bellino.",
+      desc: {
+        it: "Il gioco del Fanta Animatori per i campi estivi di Sant'Anna di Bellino.",
+        en: "The Fanta Animatori game for the summer camps in Sant'Anna di Bellino."
+      },
       cat: "personali",
       icon: "bi-trophy",
       tags: ["Fantasy game", "Campi estivi"]
@@ -65,7 +363,10 @@
     {
       name: "Appunti TPSIT",
       url: "https://mattiabracco05.github.io/APPUNTI-TPSIT/",
-      desc: "Guida completa con tutti i miei appunti di TPSIT.",
+      desc: {
+        it: "Guida completa con tutti i miei appunti di TPSIT.",
+        en: "A complete guide with all my TPSIT class notes."
+      },
       cat: "appunti",
       icon: "bi-journal-code",
       tags: ["TPSIT", "Guida"]
@@ -73,7 +374,10 @@
     {
       name: "Appunti NodeJS",
       url: "https://appunti-65795.firebaseapp.com/index",
-      desc: "Guida pratica a Node.js, dai moduli al server.",
+      desc: {
+        it: "Guida pratica a Node.js, dai moduli al server.",
+        en: "A practical guide to Node.js, from modules to the server."
+      },
       cat: "appunti",
       icon: "bi-filetype-js",
       tags: ["Node.js", "Firebase"]
@@ -81,7 +385,10 @@
     {
       name: "Appunti Codifiche",
       url: "https://mattiabracco05.github.io/CODIFICHE/",
-      desc: "Il primo sito che ho realizzato: appunti sulle codifiche audio e video.",
+      desc: {
+        it: "Il primo sito che ho realizzato: appunti sulle codifiche audio e video.",
+        en: "The first site I ever built: notes on audio and video encoding."
+      },
       cat: "appunti",
       icon: "bi-file-earmark-play",
       tags: ["Audio/Video", "Primo sito"]
@@ -89,7 +396,10 @@
     {
       name: "English Car",
       url: "https://mattiabracco05.github.io/ENGLISH-CAR/",
-      desc: "Ricerca sull'automobile realizzata come progetto di inglese.",
+      desc: {
+        it: "Ricerca sull'automobile realizzata come progetto di inglese.",
+        en: "Research on the automobile, made as an English class project."
+      },
       cat: "ricerche",
       icon: "bi-car-front",
       tags: ["Inglese", "Ricerca"]
@@ -97,7 +407,10 @@
     {
       name: "Formula 1",
       url: "https://mattiabracco05.github.io/F1/",
-      desc: "Ricerca di TPSIT per imparare a costruire un sito con Bootstrap.",
+      desc: {
+        it: "Ricerca di TPSIT per imparare a costruire un sito con Bootstrap.",
+        en: "A TPSIT research project to learn how to build a site with Bootstrap."
+      },
       cat: "ricerche",
       icon: "bi-speedometer",
       tags: ["Bootstrap", "TPSIT"]
@@ -105,7 +418,10 @@
     {
       name: "API Spotify",
       url: "https://spotify-search-artists.web.app/",
-      desc: "Ricerca di artisti su Spotify, nata per capire il funzionamento delle API.",
+      desc: {
+        it: "Ricerca di artisti su Spotify, nata per capire il funzionamento delle API.",
+        en: "Artist search on Spotify, built to understand how APIs work."
+      },
       cat: "ricerche",
       icon: "bi-spotify",
       tags: ["API REST", "Firebase"]
@@ -113,7 +429,10 @@
     {
       name: "Convention",
       url: "http://convention.infinityfreeapp.com/",
-      desc: "Progetto d'esame realizzato con PHP e MySQL.",
+      desc: {
+        it: "Progetto d'esame realizzato con PHP e MySQL.",
+        en: "Exam project built with PHP and MySQL."
+      },
       cat: "ricerche",
       icon: "bi-database-check",
       tags: ["PHP", "MySQL"]
@@ -121,7 +440,10 @@
     {
       name: "Capolavoro 2024",
       url: "https://mattiabracco05.github.io/CAPOLAVORO/",
-      desc: "Capolavoro sul PCTO per l'esame di maturità a.s. 2023/2024.",
+      desc: {
+        it: "Capolavoro sul PCTO per l'esame di maturità a.s. 2023/2024.",
+        en: "Capstone project on my work placement for the 2023/2024 final exam."
+      },
       cat: "ricerche",
       icon: "bi-award",
       tags: ["PCTO", "Maturità"]
@@ -129,7 +451,10 @@
     {
       name: "Zombie Star",
       url: "https://mattiabracco05.github.io/ZOMBIE-STAR/",
-      desc: "Gioco arcade realizzato con la libreria Phaser 3.",
+      desc: {
+        it: "Gioco arcade realizzato con la libreria Phaser 3.",
+        en: "Arcade game built with the Phaser 3 library."
+      },
       cat: "giochi",
       icon: "bi-controller",
       tags: ["Phaser 3", "Arcade"]
@@ -137,7 +462,10 @@
     {
       name: "Zombie World",
       url: "https://mattiabracco05.github.io/ZOMBIE-WORLD/",
-      desc: "Il seguito di Zombie Star, sempre con Phaser 3.",
+      desc: {
+        it: "Il seguito di Zombie Star, sempre con Phaser 3.",
+        en: "The sequel to Zombie Star, again with Phaser 3."
+      },
       cat: "giochi",
       icon: "bi-controller",
       tags: ["Phaser 3", "Arcade"]
@@ -145,7 +473,10 @@
     {
       name: "Super Hero",
       url: "https://mattiabracco05.github.io/SUPER-HERO/",
-      desc: "Platform con protagonista un supereroe, scritto in Phaser 3.",
+      desc: {
+        it: "Platform con protagonista un supereroe, scritto in Phaser 3.",
+        en: "A platformer starring a superhero, written in Phaser 3."
+      },
       cat: "giochi",
       icon: "bi-lightning-charge",
       tags: ["Phaser 3", "Platform"]
@@ -153,7 +484,10 @@
     {
       name: "Campo Minato",
       url: "https://mattiabracco05.github.io/CW-CAMPO-MINATO",
-      desc: "Il classico campo minato, creato durante la Boolean Coding Week.",
+      desc: {
+        it: "Il classico campo minato, creato durante la Boolean Coding Week.",
+        en: "The classic minesweeper, made during Boolean Coding Week."
+      },
       cat: "giochi",
       icon: "bi-grid-3x3",
       tags: ["Coding Week", "JavaScript"]
@@ -161,7 +495,10 @@
     {
       name: "Ducker",
       url: "https://mattiabracco05.github.io/CW-DUCKER",
-      desc: "Mini gioco nato durante la Boolean Coding Week.",
+      desc: {
+        it: "Mini gioco nato durante la Boolean Coding Week.",
+        en: "A mini game born during Boolean Coding Week."
+      },
       cat: "giochi",
       icon: "bi-joystick",
       tags: ["Coding Week", "JavaScript"]
@@ -169,7 +506,10 @@
     {
       name: "Stacker",
       url: "https://mattiabracco05.github.io/CW-STACKER",
-      desc: "Gioco a torre con tempismo, dalla Boolean Coding Week.",
+      desc: {
+        it: "Gioco a torre basato sul tempismo, dalla Boolean Coding Week.",
+        en: "A timing-based tower game, from Boolean Coding Week."
+      },
       cat: "giochi",
       icon: "bi-layers",
       tags: ["Coding Week", "JavaScript"]
@@ -177,7 +517,10 @@
     {
       name: "Progetti di classe",
       url: "https://progetti-itis-rivoira-4c.web.app/",
-      desc: "Home page che raccoglie i progetti svolti con la classe.",
+      desc: {
+        it: "Home page che raccoglie i progetti svolti con la classe.",
+        en: "The home page collecting the projects done with my class."
+      },
       cat: "scuola",
       icon: "bi-people",
       tags: ["Classe", "Firebase"]
@@ -185,7 +528,10 @@
     {
       name: "Widget Tkinter",
       url: "https://progetti-itis-rivoira-4c.web.app/Progetti/Tkinter",
-      desc: "Relazioni sui widget della libreria Tkinter per Python 3.",
+      desc: {
+        it: "Relazioni sui widget della libreria Tkinter per Python 3.",
+        en: "Reports on the widgets of the Tkinter library for Python 3."
+      },
       cat: "scuola",
       icon: "bi-filetype-py",
       tags: ["Python", "Tkinter"]
@@ -193,7 +539,10 @@
     {
       name: "Ricerche Apice",
       url: "https://progetti-itis-rivoira-4c.web.app/Progetti/Apice",
-      desc: "Le ricerche realizzate per il progetto Apice.",
+      desc: {
+        it: "Le ricerche realizzate per il progetto Apice.",
+        en: "The research produced for the Apice project."
+      },
       cat: "scuola",
       icon: "bi-mortarboard",
       tags: ["Apice", "Ricerca"]
@@ -201,7 +550,10 @@
     {
       name: "FollowMe",
       url: "https://follow-me-itis-rivoira.web.app/",
-      desc: "Evacuazione di emergenza e navigazione interna del nuovo edificio dell'ITIS G. Rivoira.",
+      desc: {
+        it: "Evacuazione di emergenza e navigazione interna del nuovo edificio dell'ITIS G. Rivoira.",
+        en: "Emergency evacuation and indoor navigation for the new ITIS G. Rivoira building."
+      },
       cat: "scuola",
       icon: "bi-signpost-split",
       tags: ["Sicurezza", "Firebase"]
@@ -209,13 +561,17 @@
     {
       name: "Obelix",
       url: "http://37.60.34.42:8080/",
-      desc: "Prenotazione del pranzo per l'IIS Denina-Pellico-Rivoira.",
+      desc: {
+        it: "Prenotazione del pranzo per l'IIS Denina-Pellico-Rivoira.",
+        en: "Lunch booking for IIS Denina-Pellico-Rivoira."
+      },
       cat: "scuola",
       icon: "bi-basket",
       tags: ["Web app", "Prenotazioni"]
     }
   ];
 
+  /* Nomi propri: uguali in tutte le lingue */
   var TECH = [
     { label: "HTML5", icon: "bi-filetype-html", tone: "--cat-personali" },
     { label: "CSS3", icon: "bi-filetype-css", tone: "--cat-appunti" },
@@ -257,15 +613,22 @@
   /* -----------------------------------------------------------
      3. Tema chiaro / scuro
      ----------------------------------------------------------- */
+  function isLight() { return document.documentElement.getAttribute("data-theme") === "light"; }
+
+  function syncThemeLabel() {
+    var btn = $(".theme-toggle");
+    if (btn) btn.setAttribute("aria-label", isLight() ? t("theme.toDark") : t("theme.toLight"));
+  }
+
   (function theme() {
     var btn = $(".theme-toggle");
     if (!btn) return;
     btn.addEventListener("click", function () {
-      var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+      var next = isLight() ? "dark" : "light";
       document.documentElement.setAttribute("data-theme", next);
       try { localStorage.setItem("portale-theme", next); } catch (e) { /* storage non disponibile */ }
-      btn.setAttribute("aria-label", next === "light" ? "Passa al tema scuro" : "Passa al tema chiaro");
-      toast(next === "light" ? "Tema chiaro attivo" : "Tema scuro attivo", "bi-palette");
+      syncThemeLabel();
+      toast(next === "light" ? t("toast.light") : t("toast.dark"), "bi-palette");
     });
   })();
 
@@ -286,92 +649,130 @@
   /* -----------------------------------------------------------
      5. Hero: titolo a righe animate
      ----------------------------------------------------------- */
-  (function heroLines() {
+  function heroLines(animate) {
     var h1 = $("[data-lines]");
     if (!h1) return;
-    var parts = h1.getAttribute("data-lines").split("|");
-    h1.innerHTML = parts
+    h1.innerHTML = t("hero.lines")
+      .split("|")
       .map(function (txt, i) {
         var inner = txt.indexOf("*") === 0
           ? '<em class="gradient-text" style="font-style:normal">' + txt.slice(1) + "</em>"
           : txt;
-        return '<span class="line"><span style="--d:' + (120 + i * 110) + '">' + inner + "</span></span>";
+        var delay = animate ? 120 + i * 110 : 0;
+        return '<span class="line"><span style="--d:' + delay + '">' + inner + "</span></span>";
       })
       .join("");
-  })();
+  }
 
   /* -----------------------------------------------------------
      6. Vetrina "pilastri" pinnata allo scroll
      ----------------------------------------------------------- */
-  var pillarState = { track: null, items: [], dots: [], count: 0 };
+  var pillarState = { track: null, rail: null, items: [], dots: [], count: 0 };
+  var isPhone = window.matchMedia("(max-width: 820px)");
 
-  (function buildPillars() {
+  function buildPillars() {
     var stage = $("#pillarsStage");
-    var dotsBox = $("#pillarsDots");
     if (!stage) return;
 
     var stars = SITES.filter(function (s) { return s.star; });
     var tones = ["--cat-appunti", "--cat-flagship"];
 
-    stage.insertAdjacentHTML("afterbegin", stars
+    var panels = stars
       .map(function (s, i) {
         return (
           '<article class="pillar" style="--tone: var(' + tones[i % tones.length] + '); --tone-2: var(--accent-2)">' +
             '<div class="pillar__body">' +
               '<span class="pillar__index">0' + (i + 1) + " / 0" + stars.length + "</span>" +
               "<h3>" + s.name + "</h3>" +
-              '<span class="pillar__role">' + s.role + "</span>" +
-              '<p class="pillar__text">' + s.long + "</p>" +
+              '<span class="pillar__role">' + tr(s.role) + "</span>" +
+              '<p class="pillar__text">' + tr(s.long) + "</p>" +
               '<div class="pillar__meta">' +
-                s.tags.map(function (t) { return '<span class="tag">' + t + "</span>"; }).join("") +
+                trTags(s.tags).map(function (x) { return '<span class="tag">' + x + "</span>"; }).join("") +
               "</div>" +
               '<div class="pillar__cta">' +
                 '<a class="btn btn--primary" href="' + s.url + '" target="_blank" rel="noopener">' +
-                  "Apri " + s.name + ' <i class="bi bi-arrow-up-right"></i>' +
+                  t("pillars.open") + " " + s.name + ' <i class="bi bi-arrow-up-right"></i>' +
                 "</a>" +
               "</div>" +
             "</div>" +
             '<div class="pillar__visual" aria-hidden="true">' +
               '<span class="pillar__ring"></span><span class="pillar__ring"></span>' +
-              '<i class="bi ' + s.glyph + ' pillar__glyph"></i>' +
+              markOf(s, s.glyph, "pillar__glyph") +
             "</div>" +
           "</article>"
         );
       })
-      .join(""));
+      .join("");
 
-    if (dotsBox) {
-      dotsBox.innerHTML = stars
-        .map(function (s, i) {
-          return '<button type="button" data-go="' + i + '" aria-current="' + (i === 0) + '">' +
-                 '<span class="sr-only">Vai a ' + s.name + "</span></button>";
-        })
-        .join("");
-    }
+    var dots = '<div class="pillars__dots" id="pillarsDots" role="group" aria-label="' + t("pillars.dots") + '">' +
+      stars.map(function (s, i) {
+        return '<button type="button" data-go="' + i + '" aria-current="' + (i === 0) + '">' +
+               '<span class="sr-only">' + t("pillars.goto") + " " + s.name + "</span></button>";
+      }).join("") +
+      "</div>";
+
+    // il binario tiene i pannelli: "display:contents" su schermo largo (restano
+    // sovrapposti e pilotati dallo scroll), carosello scorrevole sul telefono
+    stage.innerHTML = '<div class="pillars__rail" id="pillarsRail">' + panels + "</div>" + dots;
 
     pillarState.track = $("#pillarsTrack");
+    pillarState.rail = $("#pillarsRail", stage);
     pillarState.items = $$(".pillar", stage);
-    pillarState.dots = dotsBox ? $$("button", dotsBox) : [];
+    pillarState.dots = $$("#pillarsDots button", stage);
     pillarState.count = stars.length;
 
-    if (dotsBox) {
-      dotsBox.addEventListener("click", function (e) {
-        var btn = e.target.closest("button[data-go]");
-        if (!btn || !pillarState.track) return;
-        var i = +btn.getAttribute("data-go");
-        var rect = pillarState.track.getBoundingClientRect();
-        var top = rect.top + window.scrollY;
-        var span = pillarState.track.offsetHeight - window.innerHeight;
-        var target = top + span * (0.3 + (0.4 * i) / Math.max(1, pillarState.count - 1));
-        window.scrollTo({ top: target, behavior: reduceMotion.matches ? "auto" : "smooth" });
-      });
+    if (pillarState.rail) {
+      pillarState.rail.addEventListener("scroll", syncRailDots, { passive: true });
     }
+    updatePillars();
+    if (isPhone.matches) syncRailDots();
+  }
+
+  /* sul telefono il pannello attivo è quello più vicino al centro del binario */
+  function syncRailDots() {
+    var st = pillarState;
+    if (!st.rail || !st.dots.length || !isPhone.matches) return;
+    var mid = st.rail.scrollLeft + st.rail.clientWidth / 2;
+    var best = 0, bestD = Infinity;
+    st.items.forEach(function (el, i) {
+      var d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - mid);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    st.dots.forEach(function (b, i) { b.setAttribute("aria-current", String(i === best)); });
+  }
+
+  /* un solo listener sullo stage, che sopravvive ai cambi di lingua */
+  (function pillarDots() {
+    var stage = $("#pillarsStage");
+    if (!stage) return;
+    stage.addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-go]");
+      if (!btn) return;
+      var i = +btn.getAttribute("data-go");
+
+      // telefono: scorre il carosello in orizzontale
+      if (isPhone.matches && pillarState.items[i]) {
+        pillarState.items[i].scrollIntoView({
+          behavior: reduceMotion.matches ? "auto" : "smooth",
+          inline: "center",
+          block: "nearest"
+        });
+        return;
+      }
+
+      // schermo largo: porta la pagina al punto di scorrimento giusto
+      if (!pillarState.track) return;
+      var top = pillarState.track.getBoundingClientRect().top + window.scrollY;
+      var span = pillarState.track.offsetHeight - window.innerHeight;
+      var target = top + span * (0.3 + (0.4 * i) / Math.max(1, pillarState.count - 1));
+      window.scrollTo({ top: target, behavior: reduceMotion.matches ? "auto" : "smooth" });
+    });
   })();
 
   function updatePillars() {
     var st = pillarState;
     if (!st.track || !st.items.length) return;
-    if (window.innerWidth <= 820 || reduceMotion.matches) return;
+    if (isPhone.matches || reduceMotion.matches) return;
 
     var rect = st.track.getBoundingClientRect();
     var span = st.track.offsetHeight - window.innerHeight;
@@ -402,28 +803,30 @@
 
   function cardHTML(s, i) {
     var c = catOf(s.cat);
+    var tags = trTags(s.tags);
+    var desc = tr(s.desc);
     return (
       '<article class="card reveal" style="--tone: var(' + c.tone + '); --i:' + (i % 9) + '"' +
         ' data-cat="' + s.cat + '"' +
         ' data-star="' + (s.star ? "1" : "0") + '"' +
         ' data-name="' + norm(s.name) + '"' +
-        ' data-hay="' + norm(s.name + " " + s.desc + " " + s.tags.join(" ") + " " + c.label) + '">' +
+        ' data-hay="' + norm(s.name + " " + desc + " " + tags.join(" ") + " " + tr(c.label)) + '">' +
         '<div class="card__top">' +
-          '<span class="card__icon"><i class="bi ' + s.icon + '"></i></span>' +
+          '<span class="card__icon">' + markOf(s, s.icon) + "</span>" +
           '<span class="card__badge' + (s.star ? " card__badge--star" : "") + '">' +
-            (s.star ? '<i class="bi bi-stars"></i> In evidenza' : c.label) +
+            (s.star ? '<i class="bi bi-stars"></i> ' + t("badge.star") : tr(c.label)) +
           "</span>" +
         "</div>" +
         '<div class="card__body">' +
           "<h3>" + s.name + "</h3>" +
-          '<p class="card__desc">' + s.desc + "</p>" +
+          '<p class="card__desc">' + desc + "</p>" +
         "</div>" +
         '<div class="card__foot">' +
-          '<div class="tags">' + s.tags.map(function (t) { return '<span class="tag">' + t + "</span>"; }).join("") + "</div>" +
+          '<div class="tags">' + tags.map(function (x) { return '<span class="tag">' + x + "</span>"; }).join("") + "</div>" +
           '<span class="card__go"><i class="bi bi-arrow-right"></i></span>' +
         "</div>" +
         '<a class="card__link" href="' + s.url + '" target="_blank" rel="noopener">' +
-          "<span>Apri " + s.name + "</span>" +
+          "<span>" + t("card.open") + " " + s.name + "</span>" +
         "</a>" +
       "</article>"
     );
@@ -504,14 +907,18 @@
       });
     }
 
-    var count = $("#resultCount");
-    if (count) count.textContent = String(shown);
-    var label = $("#resultLabel");
-    if (label) label.textContent = shown === 1 ? "sito" : "siti";
+    var word = shown === 1 ? t("res.site") : t("res.sites");
+    $$("[data-result-count]").forEach(function (el) { el.textContent = String(shown); });
+    $$("[data-result-label]").forEach(function (el) { el.textContent = word; });
+
     var empty = $("#empty");
     if (empty) empty.classList.toggle("is-on", shown === 0);
-    var reset = $("#resetFilters");
-    if (reset) reset.hidden = state.cat === "all" && !state.q;
+
+    var clean = state.cat === "all" && !state.q;
+    $$("[data-reset]").forEach(function (el) { el.hidden = clean; });
+    // pallino sul pulsante flottante quando un filtro è attivo
+    var fab = $("#fabFilters");
+    if (fab) fab.classList.toggle("has-dot", !clean);
 
     $$("[data-chip]").forEach(function (chip) {
       chip.setAttribute("aria-pressed", String(chip.getAttribute("data-chip") === state.cat));
@@ -519,7 +926,7 @@
   }
 
   /* chip categorie con contatori reali */
-  (function buildChips() {
+  function buildChips() {
     var box = $("#chips");
     if (!box) return;
     var counts = {};
@@ -527,19 +934,24 @@
     var starCount = SITES.filter(function (s) { return s.star; }).length;
 
     var html = '<button class="chip" type="button" data-chip="all" aria-pressed="true">' +
-               '<span class="chip__swatch"></span>Tutti' +
+               '<span class="chip__swatch"></span>' + t("tool.all") +
                '<span class="chip__count">' + SITES.length + "</span></button>";
 
     html += CATEGORIES.map(function (c) {
       var n = c.key === "star" ? starCount : counts[c.key] || 0;
       if (!n) return "";
       return '<button class="chip" type="button" data-chip="' + c.key + '" aria-pressed="false" style="--tone: var(' + c.tone + ')">' +
-             '<span class="chip__swatch"></span>' + c.label +
+             '<span class="chip__swatch"></span>' + tr(c.label) +
              '<span class="chip__count">' + n + "</span></button>";
     }).join("");
 
     box.innerHTML = html;
+    box.setAttribute("aria-label", t("tool.catAria"));
+  }
 
+  (function chipClicks() {
+    var box = $("#chips");
+    if (!box) return;
     box.addEventListener("click", function (e) {
       var chip = e.target.closest("[data-chip]");
       if (!chip) return;
@@ -553,11 +965,11 @@
     var wrap = $("#searchWrap");
     var input = $("#search");
     if (!input) return;
-    var t;
+    var timer;
     input.addEventListener("input", function () {
       wrap.classList.toggle("has-value", input.value.length > 0);
-      clearTimeout(t);
-      t = setTimeout(function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
         state.q = norm(input.value.trim());
         applyFilters();
       }, 110);
@@ -608,17 +1020,67 @@
     });
   })();
 
-  /* azzera filtri */
-  var resetBtn = $("#resetFilters");
-  if (resetBtn) {
-    resetBtn.addEventListener("click", function () {
+  /* azzera filtri (nella riga dei risultati e dentro la scheda) */
+  $$("[data-reset]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
       state.cat = "all";
       state.q = "";
       var input = $("#search");
       if (input) { input.value = ""; $("#searchWrap").classList.remove("has-value"); }
       applyFilters();
     });
-  }
+  });
+
+  /* -----------------------------------------------------------
+     7b. Scheda filtri sul telefono
+         La barra strumenti non viene duplicata: viene spostata dentro
+         la scheda sotto gli 820px e rimessa al suo posto sopra.
+     ----------------------------------------------------------- */
+  var sheet = (function () {
+    var box = $("#sheet");
+    var body = $("#sheetBody");
+    var slot = $("#toolbarSlot");
+    var toolbar = $("#toolbar");
+    if (!box || !body || !slot || !toolbar) return {};
+    var lastFocus = null;
+
+    function placeToolbar() {
+      if (isPhone.matches) {
+        if (toolbar.parentElement !== body) body.appendChild(toolbar);
+        return;
+      }
+      // il segnaposto e' solo un marcatore: la barra torna subito dopo di lui,
+      // figlia diretta della sezione, altrimenti position:sticky non funziona
+      if (slot.nextElementSibling !== toolbar) slot.insertAdjacentElement("afterend", toolbar);
+      close();
+    }
+
+    function open() {
+      if (!isPhone.matches) return;
+      lastFocus = document.activeElement;
+      box.classList.add("is-open");
+      box.setAttribute("aria-hidden", "false");
+      document.body.classList.add("sheet-open");
+    }
+
+    function close() {
+      if (!box.classList.contains("is-open")) return;
+      box.classList.remove("is-open");
+      box.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("sheet-open");
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    box.addEventListener("click", function (e) {
+      if (e.target === box || e.target.closest("[data-sheet-close]")) close();
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+    if (isPhone.addEventListener) isPhone.addEventListener("change", placeToolbar);
+    else if (isPhone.addListener) isPhone.addListener(placeToolbar);
+
+    placeToolbar();
+    return { open: open, close: close, place: placeToolbar, holdsToolbar: function () { return isPhone.matches; } };
+  })();
 
   /* -----------------------------------------------------------
      8. Tilt 3D + riflettore sulle card
@@ -660,8 +1122,8 @@
   (function marquee() {
     var box = $("#techMarquee");
     if (!box) return;
-    var row = TECH.map(function (t) {
-      return '<span class="tech" style="--tone: var(' + t.tone + ')"><i class="bi ' + t.icon + '"></i>' + t.label + "</span>";
+    var row = TECH.map(function (x) {
+      return '<span class="tech" style="--tone: var(' + x.tone + ')"><i class="bi ' + x.icon + '"></i>' + x.label + "</span>";
     }).join("");
     box.innerHTML =
       '<div class="marquee__row">' + row + "</div>" +
@@ -673,35 +1135,41 @@
      ----------------------------------------------------------- */
   var palette = (function () {
     var overlay = $("#palette");
-    if (!overlay) return { open: function () {} };
+    if (!overlay) return {};
     var input = $("#paletteInput");
     var list = $("#paletteList");
     var idx = 0;
     var items = [];
     var lastFocus = null;
 
-    var ACTIONS = [
-      { name: "Vai ai collegamenti", desc: "Scorri alla griglia dei siti", icon: "bi-grid", cat: "Azione", tone: "--accent-3", run: function () { jump("#collegamenti"); } },
-      { name: "Cambia tema", desc: "Alterna chiaro e scuro", icon: "bi-circle-half", cat: "Azione", tone: "--accent-2", run: function () { $(".theme-toggle").click(); } },
-      { name: "Copia la mia email", desc: "mattia.bracco05@gmail.com", icon: "bi-envelope-paper", cat: "Azione", tone: "--cat-giochi", run: copyEmail },
-      { name: "Profilo GitHub", desc: "github.com/MattiaBracco05", icon: "bi-github", cat: "Azione", tone: "--cat-scuola", run: function () { window.open("https://github.com/MattiaBracco05", "_blank", "noopener"); } }
-    ];
+    function actions() {
+      return [
+        { name: t("act.links"), desc: t("act.linksDesc"), icon: "bi-grid", tone: "--accent-3", run: function () { jump("#collegamenti"); } },
+        { name: t("act.theme"), desc: t("act.themeDesc"), icon: "bi-circle-half", tone: "--accent-2", run: function () { $(".theme-toggle").click(); } },
+        { name: t("act.copy"), desc: "mattia.bracco05@gmail.com", icon: "bi-envelope-paper", tone: "--cat-giochi", run: copyEmail },
+        { name: t("act.lang"), desc: t("act.langDesc"), icon: "bi-translate", tone: "--cat-personali", run: function () { setLang(lang === "it" ? "en" : "it"); } },
+        { name: t("act.github"), desc: "github.com/MattiaBracco05", icon: "bi-github", tone: "--cat-scuola", run: function () { window.open("https://github.com/MattiaBracco05", "_blank", "noopener"); } }
+      ];
+    }
 
     function pool() {
       return SITES.map(function (s) {
         var c = catOf(s.cat);
+        var desc = tr(s.desc);
         return {
           name: s.name,
-          desc: s.desc,
-          icon: s.icon,
-          cat: s.star ? "In evidenza" : c.label,
+          desc: desc,
+          mark: markOf(s, s.icon),
+          cat: s.star ? t("badge.star") : tr(c.label),
           tone: c.tone,
-          hay: norm(s.name + " " + s.desc + " " + s.tags.join(" ")),
+          hay: norm(s.name + " " + desc + " " + trTags(s.tags).join(" ")),
           run: function () { window.open(s.url, "_blank", "noopener"); }
         };
       }).concat(
-        ACTIONS.map(function (a) {
+        actions().map(function (a) {
           a.hay = norm(a.name + " " + a.desc);
+          a.mark = '<i class="bi ' + a.icon + '"></i>';
+          a.cat = t("palette.action");
           return a;
         })
       );
@@ -711,20 +1179,19 @@
       var q = norm(input.value.trim());
       var all = pool();
       items = q ? all.filter(function (it) {
-        return q.split(/\s+/).every(function (t) { return it.hay.indexOf(t) !== -1; });
+        return q.split(/\s+/).every(function (term) { return it.hay.indexOf(term) !== -1; });
       }) : all;
 
       if (!items.length) {
-        list.innerHTML = '<p class="palette__empty">Nessun risultato per “' + input.value + "”</p>";
+        list.innerHTML = '<p class="palette__empty">' + t("palette.empty") + " “" + input.value + "”</p>";
         return;
       }
       idx = 0;
       list.innerHTML = items
         .map(function (it, i) {
-          var tone = it.tone.indexOf("--cat") === 0 || it.tone.indexOf("--accent") === 0 ? "var(" + it.tone + ")" : it.tone;
           return '<button class="palette__item" type="button" role="option" data-i="' + i + '"' +
-                 ' aria-selected="' + (i === 0) + '" style="--tone: ' + tone + '">' +
-                 '<i class="bi ' + it.icon + '"></i>' +
+                 ' aria-selected="' + (i === 0) + '" style="--tone: var(' + it.tone + ')">' +
+                 '<span class="palette__mark">' + it.mark + "</span>" +
                  "<span><b>" + it.name + "</b><small>" + it.desc + "</small></span>" +
                  '<span class="palette__cat">' + it.cat + "</span></button>";
         })
@@ -781,7 +1248,12 @@
     overlay.addEventListener("click", function (e) { if (e.target === overlay) close(); });
     $$("[data-open-palette]").forEach(function (b) { b.addEventListener("click", open); });
 
-    return { open: open, close: close, isOpen: function () { return overlay.classList.contains("is-open"); } };
+    return {
+      open: open,
+      close: close,
+      isOpen: function () { return overlay.classList.contains("is-open"); },
+      refresh: function () { if (overlay.classList.contains("is-open")) render(); }
+    };
   })();
 
   /* -----------------------------------------------------------
@@ -791,17 +1263,23 @@
     var typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName);
     if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
       e.preventDefault();
-      palette.isOpen && palette.isOpen() ? palette.close() : palette.open();
+      if (palette.isOpen && palette.isOpen()) palette.close();
+      else if (palette.open) palette.open();
       return;
     }
     if (typing) return;
     if (e.key === "/") {
       e.preventDefault();
       var s = $("#search");
-      if (s) {
-        s.scrollIntoView({ block: "center", behavior: reduceMotion.matches ? "auto" : "smooth" });
+      if (!s) return;
+      // sul telefono la barra strumenti vive dentro la scheda: va aperta prima
+      if (sheet.holdsToolbar && sheet.holdsToolbar()) {
+        sheet.open();
         setTimeout(function () { s.focus(); }, 320);
+        return;
       }
+      s.scrollIntoView({ block: "center", behavior: reduceMotion.matches ? "auto" : "smooth" });
+      setTimeout(function () { s.focus(); }, 320);
     }
     if (e.key === "t" || e.key === "T") {
       var tt = $(".theme-toggle");
@@ -814,9 +1292,10 @@
      ----------------------------------------------------------- */
   function copyEmail() {
     var mail = "mattia.bracco05@gmail.com";
-    var done = function () { toast("Email copiata negli appunti", "bi-clipboard-check"); };
+    var done = function () { toast(t("toast.copied"), "bi-clipboard-check"); };
+    var fail = function () { toast(t("toast.copyFail") + " " + mail, "bi-exclamation-circle"); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(mail).then(done, function () { toast("Copia non riuscita: " + mail, "bi-exclamation-circle"); });
+      navigator.clipboard.writeText(mail).then(done, fail);
     } else {
       var ta = document.createElement("textarea");
       ta.value = mail;
@@ -825,7 +1304,7 @@
       ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
-      try { document.execCommand("copy"); done(); } catch (e) { toast("Copia non riuscita: " + mail, "bi-exclamation-circle"); }
+      try { document.execCommand("copy"); done(); } catch (e) { fail(); }
       document.body.removeChild(ta);
     }
   }
@@ -839,8 +1318,17 @@
   function jump(hash) {
     var el = $(hash);
     if (!el) return;
-    document.body.classList.remove("nav-open");
+    closeNav();
     el.scrollIntoView({ behavior: reduceMotion.matches ? "auto" : "smooth", block: "start" });
+  }
+
+  function closeNav() {
+    var burger = $("#burger");
+    document.body.classList.remove("nav-open");
+    if (burger) {
+      burger.setAttribute("aria-expanded", "false");
+      burger.innerHTML = '<i class="bi bi-list"></i>';
+    }
   }
 
   (function mobileNav() {
@@ -852,20 +1340,8 @@
       burger.setAttribute("aria-expanded", String(open));
       burger.innerHTML = '<i class="bi ' + (open ? "bi-x-lg" : "bi-list") + '"></i>';
     });
-    nav.addEventListener("click", function (e) {
-      if (e.target.closest("a")) {
-        document.body.classList.remove("nav-open");
-        burger.setAttribute("aria-expanded", "false");
-        burger.innerHTML = '<i class="bi bi-list"></i>';
-      }
-    });
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") {
-        document.body.classList.remove("nav-open");
-        burger.setAttribute("aria-expanded", "false");
-        burger.innerHTML = '<i class="bi bi-list"></i>';
-      }
-    });
+    nav.addEventListener("click", function (e) { if (e.target.closest("a")) closeNav(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeNav(); });
   })();
 
   /* -----------------------------------------------------------
@@ -918,15 +1394,13 @@
 
       document.documentElement.style.setProperty("--progress", p.toFixed(4));
       document.documentElement.style.setProperty("--scroll-y", Math.min(y, 2400) + "px");
+      document.documentElement.style.setProperty(
+        "--hero-fade", clamp(1 - y / (window.innerHeight * 0.75), 0, 1).toFixed(3));
 
       if (header) header.classList.toggle("is-stuck", y > 20);
       if (toTop) toTop.classList.toggle("is-on", y > 700);
-
-      var hero = $(".hero__inner");
-      if (hero) {
-        var fade = clamp(1 - y / (window.innerHeight * 0.75), 0, 1);
-        document.documentElement.style.setProperty("--hero-fade", fade.toFixed(3));
-      }
+      // i pulsanti flottanti salgono per far posto al "torna su"
+      document.body.classList.toggle("show-totop", y > 700);
 
       // sezione attiva nel menu
       var current = null;
@@ -974,12 +1448,85 @@
   })();
 
   /* -----------------------------------------------------------
-     17. Avvio
+     17. Applicazione della lingua
      ----------------------------------------------------------- */
-  renderGrid();
+  function applyStaticText() {
+    $$("[data-i18n]").forEach(function (el) {
+      var v = t(el.getAttribute("data-i18n"));
+      if (v != null) el.textContent = v;
+    });
+    $$("[data-i18n-html]").forEach(function (el) {
+      var v = t(el.getAttribute("data-i18n-html"));
+      if (v != null) el.innerHTML = v;
+    });
+    // formato: data-i18n-attr="placeholder:tool.searchPlaceholder, title:header.lang"
+    $$("[data-i18n-attr]").forEach(function (el) {
+      el.getAttribute("data-i18n-attr").split(",").forEach(function (pair) {
+        var bits = pair.split(":");
+        if (bits.length !== 2) return;
+        el.setAttribute(bits[0].trim(), t(bits[1].trim()));
+      });
+    });
+  }
+
+  function setLang(next, silent) {
+    if (LANGS.indexOf(next) === -1) next = "it";
+    lang = next;
+    document.documentElement.setAttribute("lang", lang);
+    try { localStorage.setItem("portale-lang", lang); } catch (e) { /* storage non disponibile */ }
+
+    applyStaticText();
+    syncThemeLabel();
+    heroLines(true);
+    buildPillars();
+    buildChips();
+    renderGrid();
+    if (palette.refresh) palette.refresh();
+
+    $$("[data-lang]").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-lang") === lang));
+    });
+
+    onScroll();
+    if (!silent) toast(t("toast.lang"), "bi-translate");
+  }
+
+  (function langSwitch() {
+    var box = $("#langSwitch");
+    if (!box) return;
+    box.addEventListener("click", function (e) {
+      var b = e.target.closest("button[data-lang]");
+      if (!b) return;
+      var next = b.getAttribute("data-lang");
+      if (next !== lang) setLang(next);
+    });
+  })();
+
+  /* -----------------------------------------------------------
+     18. Avvio
+     ----------------------------------------------------------- */
+  var startLang = "it";
+  try {
+    var savedLang = localStorage.getItem("portale-lang");
+    if (LANGS.indexOf(savedLang) !== -1) {
+      startLang = savedLang;
+    } else if (navigator.language && navigator.language.slice(0, 2).toLowerCase() !== "it") {
+      startLang = "en";
+    }
+  } catch (e) { /* storage non disponibile */ }
+
+  setLang(startLang, true);
+
+  /* pulsanti flottanti: collegati qui perché la palette nasce più sopra */
+  (function floatingButtons() {
+    var fs = $("#fabSearch");
+    var ff = $("#fabFilters");
+    if (fs && palette.open) fs.addEventListener("click", palette.open);
+    if (ff && sheet.open) ff.addEventListener("click", sheet.open);
+  })();
+
   $$(".reveal").forEach(function (el) { revealObserver.observe(el); });
   $$("[data-count]").forEach(function (el) { revealObserver.observe(el); });
-  onScroll();
 
   document.addEventListener("click", function (e) {
     var a = e.target.closest("a[href^='#']");
